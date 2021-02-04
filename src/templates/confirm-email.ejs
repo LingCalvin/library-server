@@ -1,0 +1,87 @@
+<!doctype html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+    }
+
+    .content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    header {
+      color: white;
+      background-color: #3f51b5;
+      padding: 8px;
+    }
+
+    .main {
+      padding: 24px;
+    }
+
+    footer {
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .button-box {
+      text-align: center;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .button {
+      color: white !important;
+      background-color: #3f51b5;
+      padding: 9px 16px;
+      text-decoration: none;
+      text-transform: uppercase;
+      border-radius: 4px;
+      display: inline-block;
+      min-width: 64px;
+      font-weight: bold;
+    }
+
+    hr {
+      width: 100%;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <header>
+      <h1>Confirm Email Address</h1>
+    </header>
+    <div class="main">
+      <p>
+        Hello,
+      </p>
+      <p>
+        Thank you for signing up for an account. Please click the link below to
+        verify your email address (<%= email %>) and complete your registration.
+      </p>
+      <div class="button-box">
+        <a href="<%= link %>" class="button">Confirm Email</a>
+      </div>
+      <p>
+        Your account will be deleted if you do not confirm your email address
+        within the next 7 days.
+      </p>
+    </div>
+    <hr>
+    <footer>
+      <h3>The Support Team</h3>
+    </footer>
+  </div>
+</body>
+
+</html>

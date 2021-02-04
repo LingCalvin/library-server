@@ -33,6 +33,7 @@
     "class-transformer": "^0.3.2",
     "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
+    "generate-password": "^1.6.0",
     "nodemailer": "^6.4.17",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
@@ -42,8 +43,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
     "typeorm": "^0.2.30",
-    "typeorm-transactional-cls-hooked": "^0.1.20",
-    "uuid": "^8.3.2"
+    "typeorm-transactional-cls-hooked": "^0.1.20"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
@@ -58,7 +58,6 @@
     "@types/passport-jwt": "^3.0.4",
     "@types/passport-local": "^1.0.33",
     "@types/supertest": "^2.0.10",
-    "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
     "eslint": "^7.12.1",

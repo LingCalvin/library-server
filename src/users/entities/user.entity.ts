@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, Generated, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -26,9 +26,8 @@ export class User {
   phoneNumber: string;
 
   @Column()
-  @Generated('uuid')
   @Exclude({ toPlainOnly: true })
-  tokenVersion: string;
+  tokenSecret: string;
 
   @Column({ default: false })
   isActive: boolean;

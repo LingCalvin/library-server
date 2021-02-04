@@ -36,11 +36,8 @@ export class AuthController {
     if (req.cookies.access_token) {
       try {
         await this.authService.revokeToken(req.cookies.access_token);
-      } catch (e) {
+      } catch {
         // Attempting to revoke an invalid token is alright
-        if (e.name !== 'JsonWebTokenError' || e.name !== 'TokenExpiredError') {
-          throw e;
-        }
       }
     }
 

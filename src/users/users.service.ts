@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { generateHash } from '../common/utils/password.util';
+import { generateTokenSecret } from '../common/utils/secret.util';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -30,6 +31,7 @@ export class UsersService {
     user.middleName = middleName;
     user.lastName = lastName;
     user.phoneNumber = phoneNumber;
+    user.tokenSecret = generateTokenSecret();
     return this.usersRepository.save(user);
   }
 
@@ -47,16 +49,24 @@ export class UsersService {
 
   @Transactional()
   async updateUserInfo(id: string, userInfo: UpdateUserDto) {
+    if (userInfo.password) {
+      await this.changePassword(id, userInfo.password);
+    }
     this.usersRepository.update(id, {
       firstName: userInfo.firstName,
       middleName: userInfo.middleName,
       lastName: userInfo.lastName,
       phoneNumber: userInfo.phoneNumber,
       email: userInfo.email,
-      password: userInfo.password
-        ? await generateHash(userInfo.password)
-        : undefined,
       isActive: userInfo.isActive,
+    });
+  }
+
+  @Transactional()
+  async changePassword(id: string, password: string) {
+    this.usersRepository.update(id, {
+      password: await generateHash(password),
+      tokenSecret: generateTokenSecret(),
     });
   }
 

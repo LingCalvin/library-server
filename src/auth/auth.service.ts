@@ -29,7 +29,6 @@ export class AuthService {
       jti: uuidv4(),
       sub: user.id,
       use: purpose,
-      ver: user.tokenVersion,
     };
 
     let expiresIn = undefined;
@@ -47,7 +46,10 @@ export class AuthService {
         expiresIn = this.config.get<string>('PASSWORD_RESET_TOKEN_EXP', '10m');
     }
 
-    return this.jwtService.signAsync(payload, { expiresIn });
+    return this.jwtService.signAsync(payload, {
+      expiresIn,
+      secret: user.tokenSecret,
+    });
   }
 
   @Transactional()

@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
-    config: ConfigService,
+    private jwtService: JwtService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -21,18 +21,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         (req: Request) => req.cookies.access_token,
       ]),
       ignoreExpiration: false,
-      secretOrKey: config.get('JWT_SECRET'),
+      secretOrKeyProvider: async (request, token, done) => {
+        try {
+          const decoded = this.jwtService.decode(token) as JwtPayload;
+          const user = await this.usersService.findOne(decoded.sub);
+          done(null, user.tokenSecret);
+        } catch (e) {
+          done(e);
+        }
+      },
     });
   }
 
   async validate(payload: JwtPayload) {
     const user = await this.usersService.findOne(payload.sub);
     const isRevoked = await this.authService.isTokenRevoked(payload.jti);
-    if (
-      payload.use !== TokenPurpose.Access ||
-      user.tokenVersion !== payload.ver ||
-      isRevoked
-    ) {
+    if (payload.use !== TokenPurpose.Access || isRevoked) {
       throw new UnauthorizedException();
     }
     return user;

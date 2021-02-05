@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { AuthService } from '../auth/auth.service';
+import { InvalidTokenException } from '../auth/exceptions/invalid-token.exception';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { generateHash } from '../common/utils/password.util';
 import { generateTokenSecret } from '../common/utils/secret.util';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,6 +17,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private jwtService: JwtService,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
   ) {}
 
   @Transactional()
@@ -71,5 +78,28 @@ export class UsersService {
   @Transactional()
   remove(id: string) {
     this.usersRepository.delete(id);
+  }
+
+  @Transactional()
+  async completeRegistration(token: string) {
+    try {
+      const { sub } = this.jwtService.decode(token) as JwtPayload;
+      const user = await this.findOne(sub);
+      const { jti, email } = this.jwtService.verify(token, {
+        secret: user.tokenSecret,
+      }) as JwtPayload;
+      if (
+        (await this.authService.isTokenRevoked(jti)) ||
+        email !== user.email
+      ) {
+        throw new InvalidTokenException();
+      }
+      this.usersRepository.update(sub, {
+        isEmailVerified: true,
+        isActive: true,
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 }

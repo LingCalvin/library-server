@@ -10,33 +10,33 @@ import {
 export class UpdateUserDto {
   @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  password: string;
+  password?: string;
 
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  firstName?: string;
 
   @IsOptional()
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  middleName: string;
+  middleName?: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  lastName?: string;
 
   @IsOptional()
   @IsPhoneNumber()
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @IsOptional()
   @IsBoolean()
-  isActive: boolean;
+  isActive?: boolean;
 }

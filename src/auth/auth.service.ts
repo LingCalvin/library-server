@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { verify } from '../common/utils/password.util';
 import { User } from '../users/entities/user.entity';
-import { UsersService } from '../users/users.service';
 import { RevokedToken } from './entities/revoked-token.entity';
 import { TokenPurpose } from './enums/token-purpose.enum';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -17,7 +16,8 @@ export class AuthService {
   constructor(
     @InjectRepository(RevokedToken)
     private revokedTokensRepository: Repository<RevokedToken>,
-    private usersService: UsersService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
@@ -29,6 +29,8 @@ export class AuthService {
       jti: uuidv4(),
       sub: user.id,
       use: purpose,
+      email:
+        purpose === TokenPurpose.EmailVerification ? user.email : undefined,
     };
 
     let expiresIn = undefined;
@@ -67,7 +69,9 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string) {
-    const user = await this.usersService.findOneByEmail(username);
+    const user = await this.usersRepository.findOne({
+      where: { email: username },
+    });
     if (user && (await verify(user.password, password))) {
       return user;
     }

@@ -5,4 +5,5 @@ export interface JwtPayload {
   sub: string;
   exp: number;
   use: TokenPurpose;
+  email?: string;
 }

@@ -1,5 +1,10 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -34,4 +39,7 @@ export class User {
 
   @Column({ default: false })
   isEmailVerified: boolean;
+
+  @CreateDateColumn()
+  registrationDate: Date;
 }

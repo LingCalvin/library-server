@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { EmailModule } from '../email/email.module';
 import { AuthModule } from '../auth/auth.module';
 import { AccountsController } from './accounts.controller';
+import { UserCleanupService } from './tasks/user-cleanup.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { AccountsController } from './accounts.controller';
     EmailModule,
     forwardRef(() => AuthModule),
   ],
-  providers: [UsersService],
+  providers: [UsersService, UserCleanupService],
   controllers: [UsersController, AccountsController],
   exports: [UsersService, TypeOrmModule],
 })

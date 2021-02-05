@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { AuthService } from '../auth/auth.service';
+import { TokenPurpose } from '../auth/enums/token-purpose.enum';
 import { InvalidTokenException } from '../auth/exceptions/invalid-token.exception';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { generateHash } from '../common/utils/password.util';
@@ -85,10 +86,11 @@ export class UsersService {
     try {
       const { sub } = this.jwtService.decode(token) as JwtPayload;
       const user = await this.findOne(sub);
-      const { jti, email } = this.jwtService.verify(token, {
+      const { jti, email, use } = this.jwtService.verify(token, {
         secret: user.tokenSecret,
       }) as JwtPayload;
       if (
+        use !== TokenPurpose.EmailVerification ||
         (await this.authService.isTokenRevoked(jti)) ||
         email !== user.email
       ) {

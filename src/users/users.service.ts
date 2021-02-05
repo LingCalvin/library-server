@@ -16,21 +16,14 @@ export class UsersService {
   ) {}
 
   @Transactional()
-  async create({
-    email,
-    password,
-    firstName,
-    middleName,
-    lastName,
-    phoneNumber,
-  }: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const user = new User();
-    user.email = email;
-    user.password = await generateHash(password);
-    user.firstName = firstName;
-    user.middleName = middleName;
-    user.lastName = lastName;
-    user.phoneNumber = phoneNumber;
+    user.email = createUserDto.email;
+    user.password = await generateHash(createUserDto.password);
+    user.firstName = createUserDto.firstName;
+    user.middleName = createUserDto.middleName;
+    user.lastName = createUserDto.lastName;
+    user.phoneNumber = createUserDto.phoneNumber;
     user.tokenSecret = generateTokenSecret();
     return this.usersRepository.save(user);
   }

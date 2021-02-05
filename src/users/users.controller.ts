@@ -8,20 +8,61 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { EmailsService } from '../emails/emails.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IdParamDto } from './dto/id-param.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import * as ejs from 'ejs';
+import { resolve } from 'path';
+import { AuthService } from '../auth/auth.service';
+import { TokenPurpose } from '../auth/enums/token-purpose.enum';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private emailsService: EmailsService,
+    private authService: AuthService,
+    private config: ConfigService,
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Transactional()
+  async create(@Body() createUserDto: CreateUserDto) {
+    const user = await this.usersService.create(createUserDto);
+    const token = await this.authService.issueToken(
+      user,
+      TokenPurpose.EmailVerification,
+    );
+    this.emailsService.sendMail({
+      from: this.config.get('REGISTRATION_EMAIL_FROM'),
+      to: createUserDto.email,
+      subject: this.config.get(
+        'REGISTRATION_EMAIL_SUBJECT',
+        'Complete Registration',
+      ),
+      html: await ejs.renderFile(
+        this.config.get(
+          'RESET_PASSWORD_EMAIL_TEMPLATE',
+          resolve(__dirname, '../templates/confirm-email.ejs'),
+        ),
+        {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          token,
+          link: `${this.config.get(
+            'COMPLETE_REGISTRATION_BASE_URL',
+            'localhost/confirm-email',
+          )}/${token}`,
+        },
+      ),
+    });
+    return user;
   }
 
   @Get()

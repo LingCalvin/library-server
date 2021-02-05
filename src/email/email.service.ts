@@ -5,7 +5,7 @@ import Mail from 'nodemailer/lib/mailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 @Injectable()
-export class EmailsService {
+export class EmailService {
   transporter: Mail;
   constructor(config: ConfigService) {
     const smtpOptions: SMTPTransport.Options = {

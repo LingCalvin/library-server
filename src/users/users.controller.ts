@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
-import { EmailsService } from '../emails/emails.service';
+import { EmailService } from '../email/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IdParamDto } from './dto/id-param.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -25,7 +25,7 @@ import { TokenPurpose } from '../auth/enums/token-purpose.enum';
 export class UsersController {
   constructor(
     private usersService: UsersService,
-    private emailsService: EmailsService,
+    private emailsService: EmailService,
     private authService: AuthService,
     private config: ConfigService,
   ) {}

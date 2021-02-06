@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -12,6 +13,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -28,7 +30,7 @@ export class AuthController {
     res.cookie('access_token', accessToken, {
       expires: new Date(exp * 1000),
       httpOnly: true,
-      secure: true,
+      secure: this.config.get('COOKIE_SECURE') === 'true',
       sameSite: 'strict',
     });
 

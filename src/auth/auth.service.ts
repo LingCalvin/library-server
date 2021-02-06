@@ -10,6 +10,8 @@ import { TokenPurpose } from './enums/token-purpose.enum';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
+import { isJWT } from 'class-validator';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 
 @Injectable()
 export class AuthService {
@@ -56,8 +58,14 @@ export class AuthService {
 
   @Transactional()
   async revokeToken(token: string) {
-    const decodedToken: JwtPayload = this.jwtService.verify(token);
-    const { jti, exp } = decodedToken;
+    const { sub } = this.jwtService.decode(token) as JwtPayload;
+    const user = await this.usersRepository.findOne({
+      where: { id: sub },
+    });
+
+    const { jti, exp } = this.jwtService.verify(token, {
+      secret: user.tokenSecret,
+    });
     const revokedToken = new RevokedToken();
     revokedToken.jti = jti;
     revokedToken.exp = new Date(exp * 1000);
@@ -66,6 +74,35 @@ export class AuthService {
 
   async isTokenRevoked(jti: string) {
     return !!(await this.revokedTokensRepository.findOne({ where: { jti } }));
+  }
+
+  async verifyToken(token: string) {
+    if (!isJWT(token)) {
+      throw new InvalidTokenException();
+    }
+
+    const payload = this.jwtService.decode(token) as JwtPayload;
+    if (!payload) {
+      throw new InvalidTokenException();
+    }
+
+    const user = await this.usersRepository.findOne({
+      where: { id: payload.sub },
+    });
+    if (!user) {
+      throw new InvalidTokenException();
+    }
+
+    const secret = user.tokenSecret;
+    const verifiedToken = this.jwtService.verify(token, {
+      secret,
+    }) as JwtPayload;
+
+    if (await this.isTokenRevoked(verifiedToken.jti)) {
+      throw new InvalidTokenException();
+    }
+
+    return verifiedToken;
   }
 
   async validateUser(username: string, password: string) {

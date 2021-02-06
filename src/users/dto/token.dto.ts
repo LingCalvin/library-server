@@ -1,6 +1,6 @@
 import { IsJWT } from 'class-validator';
 
-export class CreateVerifiedAccountDto {
+export class TokenDto {
   @IsJWT()
   token: string;
 }

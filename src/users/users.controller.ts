@@ -47,8 +47,8 @@ export class UsersController {
       ),
       html: await ejs.renderFile(
         this.config.get(
-          'RESET_PASSWORD_EMAIL_TEMPLATE',
-          resolve(__dirname, '../templates/confirm-email.ejs'),
+          'CONFIRM_EMAIL_TEMPLATE',
+          resolve(__dirname, '../templates/complete-registration.ejs'),
         ),
         {
           firstName: user.firstName,
@@ -56,7 +56,7 @@ export class UsersController {
           email: user.email,
           token,
           link: `${this.config.get(
-            'COMPLETE_REGISTRATION_BASE_URL',
+            'COMPLETE_REGISTRATION_LINK_BASE',
             'localhost/confirm-email',
           )}/${token}`,
         },

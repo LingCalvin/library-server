@@ -75,7 +75,7 @@ export class AccountsController {
           email: user.email,
           token,
           link: `${this.config.get(
-            'RESET_PASSWORD_BASE_URL',
+            'RESET_PASSWORD_LINK_BASE',
             'localhost/reset-password',
           )}/${token}`,
         },

@@ -12,6 +12,7 @@ import { generateTokenSecret } from '../common/utils/secret.util';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { normalize } from './utils/phone-number.util';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,7 @@ export class UsersService {
     user.firstName = createUserDto.firstName;
     user.middleName = createUserDto.middleName;
     user.lastName = createUserDto.lastName;
-    user.phoneNumber = createUserDto.phoneNumber;
+    user.phoneNumber = normalize(createUserDto.phoneNumber);
     user.tokenSecret = generateTokenSecret();
     return this.usersRepository.save(user);
   }
@@ -57,7 +58,7 @@ export class UsersService {
       firstName: userInfo.firstName,
       middleName: userInfo.middleName,
       lastName: userInfo.lastName,
-      phoneNumber: userInfo.phoneNumber,
+      phoneNumber: normalize(userInfo.phoneNumber),
       email: userInfo.email,
       isActive: userInfo.isActive,
     });

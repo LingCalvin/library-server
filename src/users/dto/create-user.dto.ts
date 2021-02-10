@@ -21,7 +21,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  middleName: string;
+  middleName?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -29,5 +29,5 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsPhoneNumber()
-  phoneNumber: string;
+  phoneNumber?: string;
 }

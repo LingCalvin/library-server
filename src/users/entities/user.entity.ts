@@ -22,13 +22,13 @@ export class User {
   firstName: string;
 
   @Column({ nullable: true })
-  middleName: string;
+  middleName: string | null;
 
   @Column()
   lastName: string;
 
   @Column({ nullable: true })
-  phoneNumber: string;
+  phoneNumber: string | null;
 
   @Column()
   @Exclude({ toPlainOnly: true })

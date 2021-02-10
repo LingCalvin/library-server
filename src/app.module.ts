@@ -9,6 +9,7 @@ import { TypeOrmConfigService } from './config/type-orm-config.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailConfigService } from './config/email-config.service';
 import { EmailModule } from './email/email.module';
+import { BooksModule } from './books/books.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { EmailModule } from './email/email.module';
     EmailModule.forRootAsync({ useClass: EmailConfigService }),
     AuthModule,
     UsersModule,
+    BooksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

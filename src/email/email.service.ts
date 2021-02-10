@@ -1,26 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { EMAIL_MODULE_OPTIONS } from './email.constants';
+import { EmailModuleOptions } from './interfaces/email-config-options.interface';
 
 @Injectable()
 export class EmailService {
   transporter: Mail;
-  constructor(config: ConfigService) {
-    const smtpOptions: SMTPTransport.Options = {
-      host: config.get('EMAIL_HOST'),
-      port: config.get<number>('EMAIL_PORT'),
-      secure: config.get<boolean>('EMAIL_SECURE'),
-      auth: {
-        user: config.get('EMAIL_USER'),
-        pass: config.get('EMAIL_PASSWORD'),
-      },
-    };
-    this.transporter = nodemailer.createTransport(smtpOptions);
+  constructor(@Inject(EMAIL_MODULE_OPTIONS) options: EmailModuleOptions) {
+    this.transporter = nodemailer.createTransport(options);
   }
 
-  sendMail(mailOptions: Mail.Options) {
+  send(mailOptions: Mail.Options) {
     return this.transporter.sendMail(mailOptions);
   }
 }

@@ -38,7 +38,7 @@ export class UsersController {
       user,
       TokenPurpose.EmailVerification,
     );
-    this.emailsService.sendMail({
+    this.emailsService.send({
       from: this.config.get('REGISTRATION_EMAIL_FROM'),
       to: createUserDto.email,
       subject: this.config.get(

@@ -57,7 +57,7 @@ export class AccountsController {
       user,
       TokenPurpose.PasswordReset,
     );
-    this.emailService.sendMail({
+    this.emailService.send({
       from: this.config.get('RESET_PASSWORD_EMAIL_FROM'),
       to: email,
       subject: this.config.get(

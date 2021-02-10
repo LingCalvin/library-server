@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmConfigService } from './config/type-orm-config.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailConfigService } from './config/email-config.service';
 import { EmailModule } from './email/email.module';
 
 @Module({
@@ -14,9 +15,9 @@ import { EmailModule } from './email/email.module';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     ScheduleModule.forRoot(),
+    EmailModule.forRootAsync({ useClass: EmailConfigService }),
     AuthModule,
     UsersModule,
-    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -32,7 +32,9 @@ export class UsersService {
     user.firstName = createUserDto.firstName;
     user.middleName = createUserDto.middleName;
     user.lastName = createUserDto.lastName;
-    user.phoneNumber = normalize(createUserDto.phoneNumber);
+    user.phoneNumber = createUserDto.phoneNumber
+      ? normalize(createUserDto.phoneNumber)
+      : undefined;
     user.tokenSecret = generateTokenSecret();
     return this.usersRepository.save(user);
   }
@@ -58,7 +60,9 @@ export class UsersService {
       firstName: userInfo.firstName,
       middleName: userInfo.middleName,
       lastName: userInfo.lastName,
-      phoneNumber: normalize(userInfo.phoneNumber),
+      phoneNumber: userInfo.phoneNumber
+        ? normalize(userInfo.phoneNumber)
+        : undefined,
       email: userInfo.email,
       isActive: userInfo.isActive,
     });

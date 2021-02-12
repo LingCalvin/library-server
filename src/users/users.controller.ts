@@ -1,6 +1,7 @@
 import {
   Body,
   ClassSerializerInterceptor,
+  ConflictException,
   Controller,
   Get,
   Param,
@@ -33,36 +34,48 @@ export class UsersController {
   @Post()
   @Transactional()
   async create(@Body() createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto);
-    const token = await this.authService.issueToken(
-      user,
-      TokenPurpose.EmailVerification,
-    );
-    this.emailsService.send({
-      from: this.config.get('REGISTRATION_EMAIL_FROM'),
-      to: createUserDto.email,
-      subject: this.config.get(
-        'REGISTRATION_EMAIL_SUBJECT',
-        'Complete Registration',
-      ),
-      html: await ejs.renderFile(
-        this.config.get(
-          'CONFIRM_EMAIL_TEMPLATE',
-          resolve(__dirname, '../templates/complete-registration.ejs'),
+    const regex = /Key \(email\)=\(.*?\) already exists\./;
+    try {
+      const user = await this.usersService.create(createUserDto);
+      const token = await this.authService.issueToken(
+        user,
+        TokenPurpose.EmailVerification,
+      );
+      this.emailsService.send({
+        from: this.config.get('REGISTRATION_EMAIL_FROM'),
+        to: createUserDto.email,
+        subject: this.config.get(
+          'REGISTRATION_EMAIL_SUBJECT',
+          'Complete Registration',
         ),
-        {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          token,
-          link: `${this.config.get(
-            'COMPLETE_REGISTRATION_LINK_BASE',
-            'localhost/confirm-email',
-          )}/${token}`,
-        },
-      ),
-    });
-    return user;
+        html: await ejs.renderFile(
+          this.config.get(
+            'CONFIRM_EMAIL_TEMPLATE',
+            resolve(__dirname, '../templates/complete-registration.ejs'),
+          ),
+          {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            token,
+            link: `${this.config.get(
+              'COMPLETE_REGISTRATION_LINK_BASE',
+              'localhost/confirm-email',
+            )}/${token}`,
+          },
+        ),
+      });
+      return user;
+    } catch (e) {
+      if (
+        e.name === 'QueryFailedError' &&
+        e.code === '23505' &&
+        regex.test(e.detail)
+      ) {
+        throw new ConflictException('Email already in use.');
+      }
+      throw e;
+    }
   }
 
   @Get()
